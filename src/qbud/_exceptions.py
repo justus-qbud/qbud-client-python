@@ -16,20 +16,20 @@ class QBudInvalidCredentialsError(QBudBaseException):
         super().__init__("You need to set 'QBUD_CLIENT_ID' and 'QBUD_CLIENT_SECRET' environment variables.")
 
 
-class QbudResourceNotFound(QBudBaseException):
+class QBudResourceNotFound(QBudBaseException):
 
     def __init__(self, message):
         default_message = "This resource does not exist."
         super().__init__(message if message else default_message)
 
 
-class QBudAssistantNotFound(QbudResourceNotFound):
+class QBudAssistantNotFound(QBudResourceNotFound):
 
     def __init__(self):
         super().__init__("The assistant ID is invalid.")
 
 
-class QbudChatNotFound(QbudResourceNotFound):
+class QBudChatNotFound(QBudResourceNotFound):
 
     def __init__(self):
         super().__init__("The chat ID is invalid.")

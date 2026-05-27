@@ -4,7 +4,7 @@ import json
 
 from ._client import Client
 from ._constants import API_PATH, BASE_URL
-from ._exceptions import QBudBaseException, QbudChatNotFound
+from ._exceptions import QBudBaseException, QBudChatNotFound
 
 
 class Chat:
@@ -107,7 +107,7 @@ class Chat:
             self._message_log.extend([{"content": message, "role": "user"}, response_message])
             return response_message
         elif response.status_code == 404:
-            raise QbudChatNotFound()
+            raise QBudChatNotFound()
         raise QBudBaseException(
             f"Failed to send message (status {response.status_code}): {response.text}"
         )
