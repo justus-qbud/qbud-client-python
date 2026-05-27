@@ -27,7 +27,7 @@ class Client:
         self.client_id = os.getenv('QBUD_CLIENT_ID')
         self.client_secret = os.getenv('QBUD_CLIENT_SECRET')
         if not self.client_id or not self.client_secret:
-            raise QBudAuthenticationError("You need to set 'QBUD_CLIENT_ID' and 'QBUD_CLIENT_SECRET' environment variables.")
+            raise QBudInvalidCredentialsError()
 
     def _get_headers(self, auth_type: str):
         headers = dict(self.client_headers)
