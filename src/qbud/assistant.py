@@ -1,14 +1,13 @@
 from .chat import Chat
 from ._client import Client
 from ._constants import BASE_URL, API_PATH
-from ._exceptions import QBudAssistantNotFound
+from ._exceptions import QBudAssistantNotFound, QBudBaseException
 
 
 class Assistant:
 
     def __init__(self, id):
         self._id = id
-        self._chat_url = f"{BASE_URL}/assistants/{id}/chats"
 
     @property
     def id(self):
@@ -32,4 +31,7 @@ class Assistant:
             )
         elif response.status_code == 404:
             raise QBudAssistantNotFound()
+        raise QBudBaseException(
+            f"Failed to create chat (status {response.status_code}): {response.text}"
+        )
 
