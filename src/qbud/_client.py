@@ -7,7 +7,7 @@ import time
 
 import requests
 
-from ._constants import BASE_URL
+from ._constants import BASE_URL, VERSION
 from ._exceptions import QBudAuthenticationError, QBudInvalidCredentialsError
 
 
@@ -15,7 +15,8 @@ class Client:
 
     client_headers = {
         "Accept": "application/json",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "User-Agent": f"qbud-python/{VERSION}",
     }
 
     # Re-mint slightly before the server's stated expiry to avoid clock-skew 401s.
