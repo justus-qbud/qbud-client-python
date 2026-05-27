@@ -32,7 +32,20 @@ print(response)
 ```
 
 ### Other features
-By design, chat messages history cannot be retrieved from our API. Use `get_messages(...)` to inspect the local history of an in-memory `Chat` instance:
+By design, chat messages history cannot be retrieved from our API. If you need history across sessions, save chats locally:
+```python
+from qbud import Chat
+
+# save a Chat object as JSON
+chat.save("chat.json")
+
+# ...session terminates
+
+# load a Chat instance from the saved JSON
+chat = Chat.load("chat.json")
+```
+
+You can also inspect the in-memory history with `get_messages(...)`:
 
 ```python
 print(chat.get_messages())

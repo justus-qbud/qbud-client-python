@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from ._client import Client
 from ._constants import API_PATH, BASE_URL
 from ._exceptions import QbudChatNotFound
@@ -32,6 +34,36 @@ class Chat:
     @property
     def key(self):
         return self._access_key
+
+    def serialize(self) -> dict:
+        """Serializes the Chat instance to a JSON-safe dict (excluding the HTTP client)."""
+        return {
+            "assistant_id": self._assistant_id,
+            "id": self._id,
+            "access_key": self._access_key,
+            "message_log": self._message_log,
+        }
+
+    @staticmethod
+    def deserialize(chat_dict: dict) -> Chat:
+        """Reconstructs a Chat instance from the dict produced by serialize()."""
+        return Chat(
+            assistant_id=chat_dict["assistant_id"],
+            id=chat_dict["id"],
+            access_key=chat_dict["access_key"],
+            message_log=chat_dict.get("message_log"),
+        )
+
+    def save(self, path: str) -> None:
+        """Saves the chat as a JSON file at the given path."""
+        with open(path, mode="w") as f:
+            json.dump(self.serialize(), f)
+
+    @staticmethod
+    def load(path: str) -> Chat:
+        """Loads a chat from a JSON file previously written by save()."""
+        with open(path, mode="r") as f:
+            return Chat.deserialize(json.load(f))
 
     def get_messages(self) -> list[dict]:
         """Returns an overview of the local message history.
