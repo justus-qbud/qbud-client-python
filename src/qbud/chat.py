@@ -13,7 +13,7 @@ class Chat:
         self,
         assistant_id: str,
         id: str,
-        access_key: str,
+        access_key: str | None = None,
         message_log: list | None = None,
         client: Client | None = None
     ):
@@ -36,21 +36,25 @@ class Chat:
         return self._access_key
 
     def serialize(self) -> dict:
-        """Serializes the Chat instance to a JSON-safe dict (excluding the HTTP client)."""
+        """Serializes the Chat instance to a JSON-safe dict.
+
+        The access key is intentionally omitted: it is a bearer credential
+        for this chat and must not be persisted to disk. Loaded chats are
+        read-only — call get_messages() to inspect history, but send_message()
+        will fail without a live access key.
+        """
         return {
             "assistant_id": self._assistant_id,
             "id": self._id,
-            "access_key": self._access_key,
             "message_log": self._message_log,
         }
 
     @staticmethod
     def deserialize(chat_dict: dict) -> Chat:
-        """Reconstructs a Chat instance from the dict produced by serialize()."""
+        """Reconstructs a (read-only) Chat instance from the dict produced by serialize()."""
         return Chat(
             assistant_id=chat_dict["assistant_id"],
             id=chat_dict["id"],
-            access_key=chat_dict["access_key"],
             message_log=chat_dict.get("message_log"),
         )
 
@@ -84,6 +88,11 @@ class Chat:
         Returns:
             A dict with the assistant's reply: {"content": <str>, "role": "assistant"}.
         """
+        if not self._access_key:
+            raise QBudBaseException(
+                "This Chat has no access key (likely loaded from disk). "
+                "Create a new chat via Assistant.create_chat() to send messages."
+            )
         url = f"{BASE_URL}{API_PATH}/assistants/{self._assistant_id}/chats/{self._id}"
         response = self._client.post(
             url,

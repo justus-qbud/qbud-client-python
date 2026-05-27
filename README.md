@@ -32,16 +32,19 @@ print(response)
 ```
 
 ### Other features
-By design, chat messages history cannot be retrieved from our API. If you need history across sessions, save chats locally:
+By design, chat message history cannot be retrieved from our API. If you need history across sessions, save chats locally:
 ```python
 from qbud import Chat
 
-# save a Chat object as JSON
+# save a Chat object as JSON (message history only — the access key is
+# never written to disk, since it is a bearer credential for the chat)
 chat.save("chat.json")
 
 # ...session terminates
 
-# load a Chat instance from the saved JSON
+# load a Chat instance from the saved JSON. The result is read-only:
+# get_messages() works, but send_message() requires a live chat created
+# via Assistant.create_chat().
 chat = Chat.load("chat.json")
 ```
 
