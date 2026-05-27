@@ -82,7 +82,7 @@ class Chat:
             message: the message to be sent.
 
         Returns:
-            A dict with the reply mapped to the key "content" and
+            A dict with the assistant's reply: {"content": <str>, "role": "assistant"}.
         """
         url = f"{BASE_URL}{API_PATH}/assistants/{self._assistant_id}/chats/{self._id}"
         response = self._client.post(url, {"prompt": message, "access_key": self._access_key})
