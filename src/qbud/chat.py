@@ -32,7 +32,7 @@ class Chat:
         return self._id
 
     @property
-    def key(self):
+    def access_key(self):
         return self._access_key
 
     def serialize(self) -> dict:
