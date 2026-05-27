@@ -21,7 +21,7 @@ class Chat:
         self._id = id
         self._access_key = access_key
         self._message_log = message_log if message_log else []
-        self._client = client if client else Client()
+        self._client = client
 
     @property
     def assistant_id(self):
@@ -88,7 +88,7 @@ class Chat:
         Returns:
             A dict with the assistant's reply: {"content": <str>, "role": "assistant"}.
         """
-        if not self._access_key:
+        if not self._access_key or self._client is None:
             raise QBudBaseException(
                 "This Chat has no access key (likely loaded from disk). "
                 "Create a new chat via Assistant.create_chat() to send messages."

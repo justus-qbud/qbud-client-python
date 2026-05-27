@@ -9,21 +9,22 @@ pip install qbud
 We recommend `python>=3.9`, but the client may run with older versions as well. The only external dependency is the widely used `requests` library, which is installed when running the above command.
 
 ### Configuration
-The client is configured entirely via environment variables:
+Authentication is done with a per-assistant access key, generated from your account.
 
 | Variable | Required | Default | Purpose |
 | --- | --- | --- | --- |
-| `QBUD_CLIENT_ID` | yes | — | Client ID, from [your account](https://app.qbud.ai/account). |
-| `QBUD_CLIENT_SECRET` | yes | — | Client secret, from the same page. Never share it. |
+| `QBUD_ASSISTANT_ACCESS_KEY` | yes* | — | Access key for the assistant. *Optional if you pass `access_key=...` to `Assistant()` directly. |
 | `QBUD_BASE_URL` | no | `https://api.qbud.ai` | Override the API host (e.g. for staging). |
 
 ### Quickstart
 
 #### 1. Connect to an assistant
-Make sure you have built an assistant via our UI. When you're editing the assistant there, copy the ID from the address bar (after `/assistants/`) to connect with our client:
+Make sure you have built an assistant via our UI. When you're editing the assistant there, copy the ID from the address bar (after `/assistants/`) and pair it with your assistant access key:
 ```python
 from qbud import Assistant
 
+assistant = Assistant("<your-assistant-id>", access_key="<your-access-key>")
+# or, with QBUD_ASSISTANT_ACCESS_KEY set in the environment:
 assistant = Assistant("<your-assistant-id>")
 ```
 
@@ -35,18 +36,6 @@ response = chat.send_message("Hi!")
 print(response)
 > {"content": "Hi there!", "role": "assistant"}
 ```
-
-### Sharing a client across assistants
-Each `Assistant` lazily creates its own internal HTTP client and caches an access token on it. If you talk to several assistants from one process, pass a shared `Client` so authentication is reused:
-```python
-from qbud import Assistant
-from qbud._client import Client
-
-client = Client()
-a1 = Assistant("<assistant-id-1>", client=client)
-a2 = Assistant("<assistant-id-2>", client=client)
-```
-`Client` is safe to share between threads — token refreshes are serialized with a lock.
 
 ### Saving and loading chats
 By design, chat message history cannot be retrieved from our API. If you need history across sessions, save chats locally:
