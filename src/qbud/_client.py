@@ -29,12 +29,14 @@ class Client:
         if not self.client_id or not self.client_secret:
             raise QBudInvalidCredentialsError()
 
-    def _get_headers(self, auth_type: str):
+    def _get_headers(self, auth_type: str, extra: dict | None = None):
         headers = dict(self.client_headers)
         if auth_type == "access":
             headers["Authorization"] = "Bearer " + self.access_token
         elif auth_type == "login":
             headers["Authorization"] = "Basic " + base64.b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode()
+        if extra:
+            headers.update(extra)
         return headers
 
     def _mint_access_token(self) -> None:
@@ -59,20 +61,20 @@ class Client:
         if self.access_token is None or time.time() >= self.access_token_expires_at:
             self._mint_access_token()
 
-    def post(self, url, data: dict = None, recursive: bool = False) -> requests.models.Response:
+    def post(self, url, data: dict = None, extra_headers: dict | None = None, recursive: bool = False) -> requests.models.Response:
         """Sends an authenticated POST. On 401, re-mints the access token once and retries."""
         self._ensure_access_token()
 
         response = requests.post(
             url,
             json=data or {},
-            headers=self._get_headers("access"),
+            headers=self._get_headers("access", extra=extra_headers),
             timeout=self._REQUEST_TIMEOUT_SECONDS,
         )
         if response.status_code == 401:
             if recursive:
                 raise QBudInvalidCredentialsError()
             self.access_token = None
-            return self.post(url, data, recursive=True)
+            return self.post(url, data, extra_headers=extra_headers, recursive=True)
 
         return response

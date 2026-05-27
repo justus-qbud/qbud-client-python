@@ -85,7 +85,11 @@ class Chat:
             A dict with the assistant's reply: {"content": <str>, "role": "assistant"}.
         """
         url = f"{BASE_URL}{API_PATH}/assistants/{self._assistant_id}/chats/{self._id}"
-        response = self._client.post(url, {"prompt": message, "access_key": self._access_key})
+        response = self._client.post(
+            url,
+            {"prompt": message},
+            extra_headers={"X-Chat-Access-Key": self._access_key},
+        )
         if response.status_code == 200:
             response_message = {
                 "content": response.json()["data"]["message"]["content"],
