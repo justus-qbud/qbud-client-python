@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import os
+import threading
 import time
 
 import requests
@@ -26,6 +27,7 @@ class Client:
         self.access_token_expires_at = 0.0
         self.client_id = os.getenv('QBUD_CLIENT_ID')
         self.client_secret = os.getenv('QBUD_CLIENT_SECRET')
+        self._token_lock = threading.Lock()
         if not self.client_id or not self.client_secret:
             raise QBudInvalidCredentialsError()
 
@@ -58,8 +60,9 @@ class Client:
         self.access_token_expires_at = time.time() + max(0.0, expires_in - self._EXPIRY_SKEW_SECONDS)
 
     def _ensure_access_token(self) -> None:
-        if self.access_token is None or time.time() >= self.access_token_expires_at:
-            self._mint_access_token()
+        with self._token_lock:
+            if self.access_token is None or time.time() >= self.access_token_expires_at:
+                self._mint_access_token()
 
     def post(self, url, data: dict = None, extra_headers: dict | None = None, recursive: bool = False) -> requests.models.Response:
         """Sends an authenticated POST. On 401, re-mints the access token once and retries."""
