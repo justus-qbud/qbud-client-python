@@ -6,7 +6,9 @@ from ._exceptions import QBudAssistantNotFound, QBudBaseException
 
 class Assistant:
 
-    def __init__(self, id):
+    def __init__(self, id: str):
+        if not isinstance(id, str) or not id:
+            raise TypeError("Assistant id must be a non-empty string.")
         self._id = id
 
     @property
