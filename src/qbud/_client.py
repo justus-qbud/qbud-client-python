@@ -19,6 +19,7 @@ class Client:
 
     # Re-mint slightly before the server's stated expiry to avoid clock-skew 401s.
     _EXPIRY_SKEW_SECONDS = 30
+    _REQUEST_TIMEOUT_SECONDS = 30
 
     def __init__(self):
         self.access_token = None
@@ -38,7 +39,12 @@ class Client:
 
     def _mint_access_token(self) -> None:
         """Exchanges client credentials for a fresh access token via /auth/token."""
-        response = requests.post(f"{BASE_URL}/auth/token", json={}, headers=self._get_headers("login"))
+        response = requests.post(
+            f"{BASE_URL}/auth/token",
+            json={},
+            headers=self._get_headers("login"),
+            timeout=self._REQUEST_TIMEOUT_SECONDS,
+        )
         if response.status_code == 401:
             raise QBudInvalidCredentialsError()
         if response.status_code != 200:
@@ -57,7 +63,12 @@ class Client:
         """Sends an authenticated POST. On 401, re-mints the access token once and retries."""
         self._ensure_access_token()
 
-        response = requests.post(url, json=data or {}, headers=self._get_headers("access"))
+        response = requests.post(
+            url,
+            json=data or {},
+            headers=self._get_headers("access"),
+            timeout=self._REQUEST_TIMEOUT_SECONDS,
+        )
         if response.status_code == 401:
             if recursive:
                 raise QBudInvalidCredentialsError()
