@@ -1,2 +1,4 @@
-BASE_URL = "http://localhost:5000"
+import os
+
+BASE_URL = os.getenv("QBUD_BASE_URL", "https://api.qbud.ai")
 API_PATH = "/api/v1"
